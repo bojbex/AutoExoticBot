@@ -124,6 +124,6 @@ async def stavvsechny(interaction: discord.Interaction):
         message += f"👤 {user.name} – Striky: {data['strike']}/3, Pochvaly: {data['pochvala']}/3\n"
 
     await interaction.response.send_message(message)
-
+await client.tree.sync(guild=discord.Object(id=GUILD_ID))
 keep_alive()
 client.run(TOKEN)
