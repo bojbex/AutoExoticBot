@@ -11,7 +11,6 @@ intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix="!", intents=intents)
 
-# Paměť pro strike/pochvalu
 user_scores = {}
 
 @client.event
@@ -26,19 +25,11 @@ async def on_ready():
 def has_role(interaction: discord.Interaction, role_name: str):
     return any(role.name == role_name for role in interaction.user.roles)
 
-def has_vedeni_role(interaction):
-    return has_role(interaction, "Vedení")
-
-def has_zamestnanec_role(interaction):
-    return has_role(interaction, "Zaměstnanec")
+def has_vedeni_role(interaction): return has_role(interaction, "Vedení")
+def has_zamestnanec_role(interaction): return has_role(interaction, "Zaměstnanec")
 
 @client.tree.command(name="omluvenka", description="Odešli omluvenku", guild=discord.Object(id=GUILD_ID))
-@app_commands.describe(
-    od="Datum OD",
-    do="Datum DO",
-    ic_duvod="Důvod (IC)",
-    ooc_duvod="Důvod (OOC)"
-)
+@app_commands.describe(od="Datum OD", do="Datum DO", ic_duvod="Důvod (IC)", ooc_duvod="Důvod (OOC)")
 async def omluvenka(interaction: discord.Interaction, od: str, do: str, ic_duvod: str, ooc_duvod: str):
     if not has_zamestnanec_role(interaction):
         await interaction.response.send_message("❌ Tento příkaz může použít jen role 'Zaměstnanec'.", ephemeral=True)
@@ -124,6 +115,9 @@ async def stavvsechny(interaction: discord.Interaction):
         message += f"👤 {user.name} – Striky: {data['strike']}/3, Pochvaly: {data['pochvala']}/3\n"
 
     await interaction.response.send_message(message)
-await client.tree.sync(guild=discord.Object(id=GUILD_ID))
+
+keep_alive()
+client.run(TOKEN)
+
 keep_alive()
 client.run(TOKEN)
