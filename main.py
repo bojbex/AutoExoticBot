@@ -118,6 +118,3 @@ async def stavvsechny(interaction: discord.Interaction):
 
 keep_alive()
 client.run(TOKEN)
-
-keep_alive()
-client.run(TOKEN)
