@@ -154,4 +154,4 @@ async def aktivita(interaction: discord.Interaction, text: str):
 
 # Spuštění
 keep_alive()
-client.run(TOKEN
+client.run(TOKEN)
