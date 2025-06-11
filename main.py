@@ -134,7 +134,7 @@ async def aktivita(interaction: discord.Interaction, od: str, do: str):
 
     username = interaction.user.name
     uid = interaction.user.id
-    directory = "/mnt/data/"
+    directory = "./data"
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, f"{username}_{uid}.txt")
 
