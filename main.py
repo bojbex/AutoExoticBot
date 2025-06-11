@@ -124,30 +124,6 @@ async def stavvsechny(interaction: discord.Interaction):
         message += f"👤 {user.name} – Striky: {data['strike']}/3, Pochvaly: {data['pochvala']}/3\n"
     await interaction.response.send_message(message)
 
-# Aktivita
-@client.tree.command(name="aktivita", description="Zaznamenej svou aktivitu", guild=discord.Object(id=GUILD_ID))
-@app_commands.describe(od="Čas začátku", do="Čas konce")
-async def aktivita(interaction: discord.Interaction, od: str, do: str):
-    if not has_zamestnanec_role(interaction):
-        await interaction.response.send_message("❌ Tento příkaz může použít jen role 'Zaměstnanec'.", ephemeral=True)
-        return
-
-    username = interaction.user.name
-    uid = interaction.user.id
-    directory = "./data"
-    os.makedirs(directory, exist_ok=True)
-    file_path = os.path.join(directory, f"{username}_{uid}.txt")
-
-    zaznam = f"{username} – od: {od} do: {do}\n"
-    with open(file_path, "a", encoding="utf-8") as f:
-        f.write(zaznam)
-
-    log_channel = discord.utils.get(interaction.guild.text_channels, name="log-aktivita")
-    if log_channel:
-        await log_channel.send(f"📌 **{username}** – aktivita od **{od}** do **{do}**")
-
-    await interaction.response.send_message("✅ Aktivita byla zaznamenána.", ephemeral=True)
-
 # Spuštění
 keep_alive()
 client.run(TOKEN)
