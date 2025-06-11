@@ -3,9 +3,11 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from keep_alive import keep_alive
+from datetime import datetime
 
 TOKEN = os.environ.get("TOKEN")
 GUILD_ID = int(os.environ.get("GUILD_ID"))
+LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID"))
 
 intents = discord.Intents.default()
 intents.members = True
@@ -25,11 +27,19 @@ async def on_ready():
 def has_role(interaction: discord.Interaction, role_name: str):
     return any(role.name == role_name for role in interaction.user.roles)
 
-def has_vedeni_role(interaction): return has_role(interaction, "Vedení")
-def has_zamestnanec_role(interaction): return has_role(interaction, "Zaměstnanec")
+def has_vedeni_role(interaction):
+    return has_role(interaction, "Vedení")
+
+def has_zamestnanec_role(interaction):
+    return has_role(interaction, "Zaměstnanec")
 
 @client.tree.command(name="omluvenka", description="Odešli omluvenku", guild=discord.Object(id=GUILD_ID))
-@app_commands.describe(od="Datum OD", do="Datum DO", ic_duvod="Důvod (IC)", ooc_duvod="Důvod (OOC)")
+@app_commands.describe(
+    od="Datum OD",
+    do="Datum DO",
+    ic_duvod="Důvod (IC)",
+    ooc_duvod="Důvod (OOC)"
+)
 async def omluvenka(interaction: discord.Interaction, od: str, do: str, ic_duvod: str, ooc_duvod: str):
     if not has_zamestnanec_role(interaction):
         await interaction.response.send_message("❌ Tento příkaz může použít jen role 'Zaměstnanec'.", ephemeral=True)
@@ -116,5 +126,32 @@ async def stavvsechny(interaction: discord.Interaction):
 
     await interaction.response.send_message(message)
 
+@client.tree.command(name="aktivita", description="Zapiš dnešní aktivitu", guild=discord.Object(id=GUILD_ID))
+@app_commands.describe(text="Popis dnešní aktivity")
+async def aktivita(interaction: discord.Interaction, text: str):
+    if not has_zamestnanec_role(interaction):
+        await interaction.response.send_message("❌ Tento příkaz může použít jen role 'Zaměstnanec'.", ephemeral=True)
+        return
+
+    user = interaction.user
+    now = datetime.now()
+    date_str = now.strftime("%Y-%m-%d %H:%M")
+
+    # Log složka
+    os.makedirs("aktivita_logs", exist_ok=True)
+    filename = f"aktivita_logs/{user.name}_{user.id}.txt"
+
+    # Zápis do souboru
+    with open(filename, "a", encoding="utf-8") as f:
+        f.write(f"[{date_str}] {text}\n")
+
+    # Odeslání do log kanálu
+    channel = client.get_channel(LOG_CHANNEL_ID)
+    if channel:
+        await channel.send(f"📝 Aktivita od {user.mention}:\n```{text}```")
+
+    await interaction.response.send_message("✅ Aktivita byla zaznamenána.", ephemeral=True)
+
+# Spuštění
 keep_alive()
-client.run(TOKEN)
+client.run(TOKEN
