@@ -1,2 +1,39 @@
-# Ignoruj složku s daty
-/data/
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env variables
+.env
+
+# Render deployment or local secrets
+data/
+
+# Replit and other config
+.replit
+*.sqlite3
+
+# Git
+*.bak
+
