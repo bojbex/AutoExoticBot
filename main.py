@@ -17,6 +17,7 @@ def keep_alive():
 
 TOKEN = os.environ.get("TOKEN")
 GUILD_ID = int(os.environ.get("GUILD_ID"))
+AKTIVITA_CHANNEL_ID = int(os.environ.get("AKTIVITA_CHANNEL_ID"))
 
 intents = discord.Intents.default()
 intents.members = True
@@ -42,7 +43,8 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Chyba při synchronizaci: {e}")
 
-# Omluvenka
+# --- Slash příkazy ---
+
 @client.tree.command(name="omluvenka", description="Odešli omluvenku", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(od="Datum OD", do="Datum DO", ic_duvod="Důvod (IC)", ooc_duvod="Důvod (OOC)")
 async def omluvenka(interaction: discord.Interaction, od: str, do: str, ic_duvod: str, ooc_duvod: str):
@@ -60,7 +62,22 @@ async def omluvenka(interaction: discord.Interaction, od: str, do: str, ic_duvod
     await interaction.channel.send(embed=embed)
     await interaction.response.send_message("✅ Omluvenka byla zaznamenána zde v kanálu.", ephemeral=True)
 
-# Strike
+@client.tree.command(name="aktivita", description="Zaznamenej svou aktivitu", guild=discord.Object(id=GUILD_ID))
+@app_commands.describe(od="Od kdy jsi aktivní", do="Do kdy jsi aktivní")
+async def aktivita(interaction: discord.Interaction, od: str, do: str):
+    log_channel = client.get_channel(AKTIVITA_CHANNEL_ID)
+    if not log_channel:
+        await interaction.response.send_message("❌ Kanál pro logování aktivity nebyl nalezen.", ephemeral=True)
+        return
+
+    embed = discord.Embed(title="📋 Aktivita", color=discord.Color.green())
+    embed.add_field(name="👤 Uživatel", value=interaction.user.mention, inline=False)
+    embed.add_field(name="📅 Od", value=od, inline=True)
+    embed.add_field(name="📅 Do", value=do, inline=True)
+
+    await log_channel.send(embed=embed)
+    await interaction.response.send_message("✅ Tvoje aktivita byla zaznamenána.", ephemeral=True)
+
 @client.tree.command(name="strike", description="Udělí hráči strike", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(user="Komu udělit strike")
 async def strike(interaction: discord.Interaction, user: discord.Member):
@@ -70,14 +87,12 @@ async def strike(interaction: discord.Interaction, user: discord.Member):
 
     uid = str(user.id)
     user_scores.setdefault(uid, {"strike": 0, "pochvala": 0})
-
     if user_scores[uid]["pochvala"] > 0:
         user_scores[uid]["pochvala"] -= 1
     elif user_scores[uid]["strike"] < 3:
         user_scores[uid]["strike"] += 1
     await interaction.response.send_message(f"⚠️ {user.mention} má striky: {user_scores[uid]['strike']}/3, pochvaly: {user_scores[uid]['pochvala']}/3")
 
-# Pochvala
 @client.tree.command(name="pochvala", description="Udělí hráči pochvalu", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(user="Komu udělit pochvalu")
 async def pochvala(interaction: discord.Interaction, user: discord.Member):
@@ -87,14 +102,12 @@ async def pochvala(interaction: discord.Interaction, user: discord.Member):
 
     uid = str(user.id)
     user_scores.setdefault(uid, {"strike": 0, "pochvala": 0})
-
     if user_scores[uid]["strike"] > 0:
         user_scores[uid]["strike"] -= 1
     elif user_scores[uid]["pochvala"] < 3:
         user_scores[uid]["pochvala"] += 1
     await interaction.response.send_message(f"👍 {user.mention} má pochvaly: {user_scores[uid]['pochvala']}/3, striky: {user_scores[uid]['strike']}/3")
 
-# Stav
 @client.tree.command(name="stav", description="Zobrazí stav striků a pochval", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(user="(pouze pro Vedení) zobrazit stav jiného člena")
 async def stav(interaction: discord.Interaction, user: discord.Member = None):
@@ -107,7 +120,6 @@ async def stav(interaction: discord.Interaction, user: discord.Member = None):
     user_scores.setdefault(uid, {"strike": 0, "pochvala": 0})
     await interaction.response.send_message(f"📊 {target.mention}: Striky {user_scores[uid]['strike']}/3, Pochvaly {user_scores[uid]['pochvala']}/3", ephemeral=True)
 
-# Stav všech
 @client.tree.command(name="stavvsechny", description="Zobrazí stav všech členů", guild=discord.Object(id=GUILD_ID))
 async def stavvsechny(interaction: discord.Interaction):
     if not has_vedeni_role(interaction):
