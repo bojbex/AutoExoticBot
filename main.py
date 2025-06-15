@@ -18,7 +18,7 @@ def keep_alive():
 # Získání tokenu a ID
 TOKEN = os.environ.get("TOKEN")
 GUILD_ID = int(os.environ.get("GUILD_ID"))
-OMLUVENKY_CHANNEL_ID = int(os.environ.get("OMLUVENKY_CHANNEL_ID"))
+OMLUVENKA_CHANNEL_ID = int(os.environ.get("OMLUVENKA_CHANNEL_ID"))
 AKTIVITA_CHANNEL_ID = int(os.environ.get("AKTIVITA_CHANNEL_ID"))
 
 intents = discord.Intents.default()
@@ -63,7 +63,7 @@ async def omluvenka(interaction: discord.Interaction, od: str, do: str, ic_duvod
     embed.add_field(name="🧠 OOC Důvod", value=ooc_duvod, inline=False)
 
     await interaction.channel.send(embed=embed)
-    channel = client.get_channel(OMLUVENKY_CHANNEL_ID)
+    channel = client.get_channel(OMLUVENKA_CHANNEL_ID)
     if channel:
         await channel.send(embed=embed)
 
