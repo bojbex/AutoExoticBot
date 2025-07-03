@@ -182,9 +182,12 @@ async def aktivita_vsech(interaction: discord.Interaction):
     message = "📊 **Celková aktivita všech členů:**\n"
     for uid, minutes in user_activity_minutes.items():
         user = await client.fetch_user(int(uid))
-        message += f"👤 {user.name}: {minutes} minut\n"
+        member = interaction.guild.get_member(int(uid))
+        display_name = member.display_name if member else user.name
+        message += f"👤 {display_name}: {minutes} minut\n"
 
     await interaction.response.send_message(message, ephemeral=True)
+
 
 # Start bota
 keep_alive()
