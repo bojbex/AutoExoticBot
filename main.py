@@ -168,6 +168,24 @@ async def stavvsechny(interaction: discord.Interaction):
         message += f"👤 {user.name} – Striky: {data['strike']}/3, Pochvaly: {data['pochvala']}/3\n"
     await interaction.response.send_message(message)
 
+# Aktivita všech
+@client.tree.command(name="aktivita_všichni", description="Zobrazí celkovou aktivitu všech členů", guild=discord.Object(id=GUILD_ID))
+async def aktivita_vsech(interaction: discord.Interaction):
+    if not has_vedeni_role(interaction):
+        await interaction.response.send_message("❌ Tento příkaz může použít jen role 'Vedení'.", ephemeral=True)
+        return
+
+    if not user_activity_minutes:
+        await interaction.response.send_message("📭 Zatím nebyla zaznamenána žádná aktivita.", ephemeral=True)
+        return
+
+    message = "📊 **Celková aktivita všech členů:**\n"
+    for uid, minutes in user_activity_minutes.items():
+        user = await client.fetch_user(int(uid))
+        message += f"👤 {user.name}: {minutes} minut\n"
+
+    await interaction.response.send_message(message, ephemeral=True)
+
 # Start bota
 keep_alive()
 client.run(TOKEN)
