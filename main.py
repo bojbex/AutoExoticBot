@@ -129,6 +129,8 @@ async def aktivita(interaction: discord.Interaction, od: str, do: str):
     except ValueError:
         await interaction.response.send_message("❌ Nesprávný formát času. Použij HH:MM.", ephemeral=True)
 
+save_activity(user_activity_minutes)
+
 # 📋 Aktivita všech
 @client.tree.command(name="aktivita_všichni", description="Zobrazí celkovou aktivitu všech", guild=discord.Object(id=GUILD_ID))
 async def aktivita_vsech(interaction: discord.Interaction):
@@ -145,6 +147,8 @@ async def aktivita_vsech(interaction: discord.Interaction):
         member = interaction.guild.get_member(int(uid))
         name = member.display_name if member else f"ID {uid}"
         message += f"👤 {name}: {minutes} minut\n"
+        
+print(f"[DEBUG] Načteno: {user_activity_minutes}")
 
     await interaction.response.send_message(message)
 
