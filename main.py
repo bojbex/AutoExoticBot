@@ -150,7 +150,6 @@ async def stav(interaction: discord.Interaction, user: discord.Member = None):
     uid = str(target.id)
     user_scores.setdefault(uid, {"strike": 0, "pochvala": 0})
     await interaction.response.send_message(f"📊 {target.mention}: Striky {user_scores[uid]['strike']}/3, Pochvaly {user_scores[uid]['pochvala']}/3", ephemeral=True)
-
 # Stav všech
 @client.tree.command(name="stavvsechny", description="Zobrazí stav všech členů", guild=discord.Object(id=GUILD_ID))
 async def stavvsechny(interaction: discord.Interaction):
