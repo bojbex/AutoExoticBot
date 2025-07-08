@@ -150,7 +150,7 @@ async def aktivita_vsech(interaction: discord.Interaction):
         
 print(f"[DEBUG] Načteno: {user_activity_minutes}")
 
-    await interaction.response.send_message(message)
+await interaction.response.send_message(message)
 
 # ⚠️ Strike / Pochvala / Stav
 user_scores = {}
